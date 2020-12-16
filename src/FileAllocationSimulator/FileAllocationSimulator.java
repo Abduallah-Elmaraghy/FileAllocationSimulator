@@ -5,6 +5,7 @@
  */
 package FileAllocationSimulator;
 
+import File.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,19 +22,32 @@ public class FileAllocationSimulator
      */
     public static void main(String[] args) throws IOException, FileNotFoundException, ClassNotFoundException 
     {
-        ArrayList<MyFile> Files = new ArrayList<MyFile>();
-        ArrayList<Integer> Disks =new ArrayList<>();
-        InFile<MyFile> WriteF = new InFile<>();
-        OutFile<MyFile> ReadF = new OutFile<>();
+        ArrayList<IndexedFile> iFiles = new ArrayList<IndexedFile>();//el array elly feeh el files b el data bta3etha
+        ArrayList<LinkedFile> lFiles = new ArrayList<LinkedFile>();//el array elly feeh el files b el data bta3etha
+        ArrayList<ContiguousFile> cFiles = new ArrayList<ContiguousFile>();//el array elly feeh el files b el data bta3etha
+        ArrayList<Integer> Disks; // array feeh el disk blocks 
+        // file that conatins the data of the files
+        InFile<File> WriteF = new InFile<>();
+        OutFile<File> ReadF = new OutFile<>();
+        //files that contains data of the disk blocks 
         InFile<Integer> WriteD = new InFile<>();
         OutFile<Integer> ReadD = new OutFile<>();
-        AllocationMethods Main = new AllocationMethods(0);
+        AllocationMethods Main;
         Scanner input =new Scanner(System.in);
         int choice;
-        int DB ;
-        int NOF ;
+        int method;
+        int DB = 0 ;
         System.out.println("______________WELCOME TO FILE ALLOCATION SIMULATOR______________");
         System.out.println("______________________CONTIGUOUS ALLOCATION_____________________");
+        System.out.println("________Please chooose the Algorithm the________");
+        System.out.println("1.Contiguous Allocation");
+        System.out.println("2.Indexed Allocation");
+        method = input.nextInt();
+        while ( method > 3 || method < 1)    
+        {
+            System.out.println("wrong input please enter 1 or 2 or 3");
+            method=input.nextInt();
+        }
         System.out.println("____Please chooose the method of passing data to the program____");
         System.out.println("1.Files");
         System.out.println("2.User_Input");
@@ -43,10 +57,20 @@ public class FileAllocationSimulator
             System.out.println("wrong input please enter 1 or 2");
             choice=input.nextInt();
         }
-        if(choice==1)
+        if(choice == 1)
         {
             Files=ReadF.Read("Myfiles.bin");
             Disks=ReadD.Read("Diskblocks.bin");
+            switch(method)
+            {
+                case 1:
+                    Main =new AllocationMethods(method,Disks);
+                    break;
+                case 2:
+                    Main =new AllocationMethods(method,Disks);
+                    break;
+                case 3:
+            }
             System.out.println("Available Disk blocks");
             for (int i=0; i<Disks.size();i++)
             {
@@ -60,9 +84,8 @@ public class FileAllocationSimulator
                 c=input.nextInt();
             }
             DB=Disks.get(c-1);
-            Main =new AllocationMethods(DB);
             Main.setFiles(Files);
-            Main.Run();
+            Main.RunContiguous();
             Files=Main.getFiles();
         }
         else
@@ -73,19 +96,22 @@ public class FileAllocationSimulator
                 System.out.println("That's not a number!");
                 input.next(); // this is important!
                 System.out.print("Please enter a valid number for disk blocks :");
+                 DB=input.nextInt();
             }
-            DB=input.nextInt();
-            Disks.add(DB);
+            Disks = new ArrayList<>(DB);
+            switch(method)
+            {
+                case 1:
+                    Main =new AllocationMethods(method,Disks);
+                    break;
+                case 2:
+                    Main =new AllocationMethods(method,Disks);
+                    break;
+                case 3:
+            }
+            //new comment
             WriteD.Write(Disks,"Diskblocks.bin");
             Main =new AllocationMethods(DB);
-            System.out.print("Please enter the number of files :");
-            while (!input.hasNextInt()) 
-            {
-                System.out.println("That's not a number!");
-                input.next(); // this is important!
-                System.out.print("Please enter a valid number for number of files :");
-            }
-            NOF = input.nextInt();
             System.out.println("Please enter the data for each file");
             for(int i = 0; i<NOF ;i++)
             {
@@ -104,7 +130,7 @@ public class FileAllocationSimulator
             }
             WriteF.Write(Files, "Myfiles.bin");
             Main.setFiles(Files);
-            Main.Run();
+            Main.RunContiguous();
             Files=Main.getFiles();
         }
         System.out.println("______________________Directory______________________");
